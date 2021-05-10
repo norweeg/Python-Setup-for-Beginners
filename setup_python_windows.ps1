@@ -32,6 +32,6 @@ Write-Host "Installing Shortcuts"
 & python .\scripts\download_icon.py "https://github.com/nteract/nteract/raw/main/applications/desktop/static/icon.png" "$env:_CONDA_ROOT\envs\anaconda\Menu\nteract.ico"
 & python .\scripts\download_icon.py "https://raw.githubusercontent.com/jupyterlab/jupyterlab_app/master/dist-resources/icon.svg" "$env:_CONDA_ROOT\envs\anaconda\Menu\jupyter_lab.ico"
 
-Copy-Item -Path ".\shortcuts\*" -Destination "$env:_CONDA_ROOT\envs\anaconda\Menu\"
+Copy-Item -Path ".\shortcuts\Windows\*" -Destination "$env:_CONDA_ROOT\envs\anaconda\Menu\"
 & python .\scripts\create_shortcuts.py
 Write-Host "Installation and setup complete!"
