@@ -13,7 +13,7 @@ stderr.setLevel(logging.WARNING)
 logging.basicConfig(
     format="%(levelname)s: %(message)s",
     level=logging.INFO,
-    handlers=[stdout,stderr],
+    handlers=[stdout, stderr],
 )
 
 # Get location of conda
@@ -86,24 +86,31 @@ except (CalledProcessError, KeyError):
     sys.exit(2)
 
 # Add in some other packages
-with open(list(Path(__file__).resolve().parents)[1] / "requirements/anaconda.txt", "r") as requires:
-    depends &= set(requires.readlines())
+with open(
+    list(Path(__file__).resolve().parents)[1] / "requirements/anaconda.txt", "r"
+) as requires:
+    depends |= set(requires.readlines())
 
 try:
     # Find packages that aren't able to be found in conda-forge
-    not_found = loads(
-        run(
-            f"{conda_exe} create --yes --name anaconda --dry-run --json".split(" ")
-            + list(depends),
-            capture_output=True,
-            check=True,
-        ).stdout
-    ).get("packages")
+    try:
+        not_found = set(
+            loads(
+                run(
+                    f"{conda_exe} create --yes --name anaconda --dry-run --json".split(" ")
+                    + list(depends),
+                    capture_output=True,
+                    check=True,
+                ).stdout
+            ).get("packages")
+        )
+    except TypeError:
+        not_found = set()
 
     # Install "anaconda" environment from conda-forge channel
     run(
         f"{conda_exe} create --yes --name anaconda".split(" ")
-        + list(depends - not_found),
+        + sorted(list(depends - not_found if not_found else depends)),
         stdout=sys.stdout,
         stderr=sys.stderr,
         check=True,
