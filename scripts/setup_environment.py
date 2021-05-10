@@ -86,7 +86,7 @@ except (CalledProcessError, KeyError):
     sys.exit(2)
 
 # Add in some other packages
-with open(Path(__file__).parent / "requirements/anaconda.txt", "r") as requires:
+with open(list(Path(__file__).resolve().parents)[1] / "requirements/anaconda.txt", "r") as requires:
     depends &= set(requires.readlines())
 
 try:
