@@ -3,7 +3,7 @@ from io import BytesIO
 from os import PathLike
 from pathlib import Path
 from platform import system
-from sys import argv
+from sys import argv, stderr
 from urllib.request import urlopen
 
 from cairosvg import svg2png
@@ -32,4 +32,8 @@ if __name__ == "__main__":
 
     args = parser.parse_args(argv[1:])
 
-    download_icon(args.url, args.destination)
+    try:
+        download_icon(args.url, args.destination)
+    except Exception as e:
+        print(f"Failed to download and convert {args.url}", file=stderr)
+        exit(1)
