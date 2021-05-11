@@ -4,7 +4,6 @@ jupyterlab_code_formatter
 jupyterlab-python-file
 jupyterlab-variableinspector
 mamba_gator
-menuinst
 nb_conda_kernels
 nodejs
 nteract_on_jupyter

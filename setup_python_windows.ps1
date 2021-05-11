@@ -33,5 +33,9 @@ Write-Host "Installing Shortcuts"
 & python .\scripts\download_icon.py "https://raw.githubusercontent.com/jupyterlab/jupyterlab_app/master/dist-resources/icon.svg" "$env:_CONDA_ROOT\envs\anaconda\Menu\jupyter_lab.ico"
 
 Copy-Item -Path ".\shortcuts\Windows\*" -Destination "$env:_CONDA_ROOT\envs\anaconda\Menu\"
-& python .\scripts\create_shortcuts.py
+$prefix = $env:CONDA_PREFIX
+& conda activate base
+& menuinst.exe --prefix="$prefix" "$prefix\Menu\jupyter.json"
+& menuinst.exe --prefix="$prefix" "$prefix\Menu\jupyter_lab.json"
+& menuinst.exe --prefix="$prefix" "$prefix\Menu\nteract.json"
 Write-Host "Installation and setup complete!"
