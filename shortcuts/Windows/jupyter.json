@@ -9,7 +9,7 @@
                 "${PREFIX}/python.exe",
                 "${PYTHON_SCRIPTS}/jupyter-nbclassic-script.py"
             ],
-            "name": "Jupyter Lab",
+            "name": "Jupyter Notebook",
             "workdir": "${USERPROFILE}",
             "icon": "${MENU_DIR}/jupyter.ico",
             "desktop": true,
