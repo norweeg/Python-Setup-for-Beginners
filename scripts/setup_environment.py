@@ -65,7 +65,6 @@ try:
                 " "
             ),
             capture_output=True,
-            check=True,
         ).stdout
     ).get("_anaconda_depends")
 
@@ -100,7 +99,6 @@ try:
                     f"{conda_exe} create --yes --name anaconda --dry-run --json".split(" ")
                     + list(depends),
                     capture_output=True,
-                    check=True,
                 ).stdout
             ).get("packages")
         )
