@@ -1,3 +1,4 @@
+from itertools import chain
 import logging
 import sys
 from json import loads
@@ -58,28 +59,61 @@ except CalledProcessError:
 
 
 try:
-    # Search for _anaconda_depends in default repository, get info on it
+    # Search for anaconda metapackage in default repository, get info on it
     search_results = loads(
         run(
-            f"{conda_exe} search --info --override-channels -c defaults _anaconda_depends --json".split(
+            f"{conda_exe} search --info --override-channels -c defaults anaconda --json".split(
                 " "
             ),
             capture_output=True,
         ).stdout
-    ).get("_anaconda_depends")
+    ).get("anaconda")
 
-    # Get only dependencies of most recent build
-    depends = {
-        d.split(" ")[0]
-        for d in [
+    # find the latest non-custom version number
+    latest_version = (
+        [
             result
             for result in search_results
             if int(result["timestamp"])
-            == max({int(result["timestamp"]) for result in search_results})
+            == max(
+                {
+                    int(result["timestamp"])
+                    for result in search_results
+                    if result.get("version") != "custom"
+                }
+            )
         ]
         .pop()
-        .get("depends")
+        .get("version")
+    )
+
+    # find all builds that match the lastest non-custom version number
+    choices = {
+        result.get("build"): result.get("depends")
+        for result in search_results
+        if result.get("version") == latest_version
     }
+
+    # find the python versions that the matching builds depend on
+    python_versions = (
+        d.split(" ")[1]
+        for d in chain.from_iterable(choices.values())
+        if d.split(" ")[0].lower() == "python"
+    )
+
+    # pick the latest python version
+    python_version = max(python_versions)
+
+    # pick the build that depends on the latest python version
+    build = [
+        b
+        for b, d in choices.items()
+        if f"python {python_version}" in (_[: _.rfind(" ")] for _ in d)
+    ].pop()
+
+    # Get only dependencies of most recent build
+    depends = {d.split(" ")[0] for d in choices[build]}
+
 except (CalledProcessError, KeyError):
     logging.exception("Failed to get dependencies for Anaconda")
     sys.exit(2)
@@ -88,7 +122,7 @@ except (CalledProcessError, KeyError):
 with open(
     list(Path(__file__).resolve().parents)[1] / "requirements/anaconda.txt", "r"
 ) as requires:
-    depends |= set(requires.readlines())
+    depends |= {line.strip() for line in requires.readlines()}
 
 try:
     # Find packages that aren't able to be found in conda-forge
@@ -96,19 +130,21 @@ try:
         not_found = set(
             loads(
                 run(
-                    f"{conda_exe} create --yes --name anaconda --dry-run --json".split(" ")
+                    f"{conda_exe} create --yes --name anaconda --dry-run --json".split(
+                        " "
+                    )
                     + list(depends),
                     capture_output=True,
                 ).stdout
             ).get("packages")
         )
-    except TypeError:
+    except (KeyError, TypeError):
         not_found = set()
 
     # Install "anaconda" environment from conda-forge channel
     run(
         f"{conda_exe} create --yes --name anaconda".split(" ")
-        + sorted(list(depends - not_found if not_found else depends)),
+        + sorted(list(depends - not_found)),
         stdout=sys.stdout,
         stderr=sys.stderr,
         check=True,
