@@ -1,7 +1,8 @@
-from itertools import chain
 import logging
+import platform
 import sys
-from json import loads
+from itertools import chain
+from json import dump, loads
 from os import cpu_count, environ
 from pathlib import Path
 from subprocess import CalledProcessError, run
@@ -152,3 +153,72 @@ try:
 except (CalledProcessError, KeyError):
     logging.exception("Failed to get dependencies for Anaconda")
     sys.exit(3)
+
+if platform.system() == "Windows":
+    conda_root = Path(environ["CONDA_PREFIX"])
+
+    # various install locations for powershell, with powershell core favored
+    for powershell_exe in chain(
+        (Path(environ["ProgramFiles"]) / "PowerShell").glob("*/pwsh.exe"),
+        (Path(environ["LOCALAPPDATA"]) / "Microsoft/WindowsApps").glob(
+            "Microsoft.PowerShell*/pwsh.exe"
+        ),
+        (Path(environ["SystemRoot"]) / "System32/WindowsPowerShell").glob(
+            "*/powershell.exe"
+        ),
+    ):
+        if powershell_exe.exists():
+            break
+    else:
+        logging.error(
+            "Powershell does not seem to be installed.  Skipping Python Powershell terminal shortcut creation"
+        )
+        sys.exit(4)
+
+    menu_spec = {
+        "menu_name": "Anaconda${PY_VER} ${PLATFORM}",
+        "menu_items": [
+            {
+                "script": str(powershell_exe),
+                "scriptarguments": [
+                    "-NoExit",
+                    "-Command",
+                    "{& conda activate ${ENV_NAME}}",
+                ],
+                "name": "Miniforge Powershell Prompt (${ENV_NAME})",
+                "workdir": "${USERPROFILE}",
+                "icon": "${MENU_DIR}/console_shortcut.ico",
+            }
+        ],
+    }
+
+    # write out constructed menu spec files
+    with open(conda_root / "Menu/powershell_prompt.json", "w") as f:
+        dump(menu_spec, f)
+
+    with open(conda_root / "envs/anaconda/Menu/powershell_prompt.json", "w") as f:
+        dump(menu_spec, f)
+
+    # install shortcut for base
+    run(
+        [
+            str(conda_root / "Scripts/menuinst.exe"),
+            "-p",
+            str(conda_root),
+            str(conda_root / "Menu/powershell_prompt.json"),
+        ],
+        stdout=sys.stdout,
+        stderr=sys.stderr,
+    )
+
+    # install shortcut for anaconda
+    run(
+        [
+            str(conda_root / "Scripts/menuinst.exe"),
+            "-p",
+            str(conda_root / "envs/anaconda"),
+            str(conda_root / "envs/anaconda/Menu/powershell_prompt.json"),
+        ],
+        stdout=sys.stdout,
+        stderr=sys.stderr,
+    )
