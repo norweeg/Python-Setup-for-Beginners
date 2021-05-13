@@ -179,13 +179,13 @@ if platform.system() == "Windows":
         "menu_name": "Anaconda${PY_VER} ${PLATFORM}",
         "menu_items": [
             {
-                "script": str(powershell_exe),
+                "system": f'"{powershell_exe}"',
                 "scriptarguments": [
                     "-NoExit",
                     "-Command",
-                    "{& conda activate ${ENV_NAME}}",
+                    "Invoke-Expression '& conda activate ${ENV_NAME}'",
                 ],
-                "name": "Miniforge Powershell Prompt (${ENV_NAME})",
+                "name": "Miniforge Powershell Prompt",
                 "workdir": "${USERPROFILE}",
                 "icon": "${MENU_DIR}/console_shortcut.ico",
             }
