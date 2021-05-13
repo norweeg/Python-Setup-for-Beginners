@@ -9,8 +9,8 @@ Python setup for absolute beginners.  The intension of this repository is to pro
 
 ## Usage
 
-1. Download [setup_python_windows.ps1](setup_python_windows.ps1)
-2. Right-click [setup_python_windows.ps1](setup_python_windows.ps1) and select "Run with Powershell"
+1. Clone this repository or download it as a zip and extract it.
+2. Open the folder and right-click [setup_python_windows.ps1](setup_python_windows.ps1) and select "Run with Powershell"
 3. When the installer is complete, you will find shortcuts to your Anaconda tools in the start menu
 
 ### Tips for Maintaining Your Python Environments
