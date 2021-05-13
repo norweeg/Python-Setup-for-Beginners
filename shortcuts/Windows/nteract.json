@@ -1,0 +1,19 @@
+{
+    "menu_name": "Anaconda${PY_VER} ${PLATFORM}",
+    "menu_items": [
+        {
+            "script": "${ROOT_PREFIX}/python.exe",
+            "scriptarguments": [
+                "${ROOT_PREFIX}/cwp.py",
+                "${PREFIX}",
+                "${PREFIX}/python.exe",
+                "${PYTHON_SCRIPTS}/jupyter-nteract-script.py"
+            ],
+            "name": "Nteract",
+            "workdir": "${USERPROFILE}",
+            "icon": "${MENU_DIR}/nteract.ico",
+            "desktop": false,
+            "quicklaunch": false
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+cairosvg
+halo
+jupyterlab_code_formatter
+jupyterlab-python-file
+jupyterlab-variableinspector
+mamba_gator
+miniforge_console_shortcut
+nb_conda_kernels
+nodejs
+nteract_on_jupyter

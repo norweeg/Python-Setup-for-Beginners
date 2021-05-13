@@ -1,0 +1,19 @@
+{
+    "menu_name": "Anaconda${PY_VER} ${PLATFORM}",
+    "menu_items": [
+        {
+            "script": "${ROOT_PREFIX}/python.exe",
+            "scriptarguments": [
+                "${ROOT_PREFIX}/cwp.py",
+                "${PREFIX}",
+                "${PREFIX}/python.exe",
+                "${PYTHON_SCRIPTS}/jupyter-nbclassic-script.py"
+            ],
+            "name": "Jupyter Notebook",
+            "workdir": "${USERPROFILE}",
+            "icon": "${MENU_DIR}/jupyter.ico",
+            "desktop": true,
+            "quicklaunch": false
+        }
+    ]
+}
